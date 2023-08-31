@@ -28,11 +28,7 @@ def update_status():
             # Get the current status value
             current_status_value = current_status['status']
 
-            # If the current status is False, change it to True
-            if current_status_value is False:
-                new_status_value = True
-            else:
-                new_status_value = current_status_value
+            new_status_value = not current_status_value
 
             # Update the existing status document with the new status value
             bulbcollection.update_one({}, {'$set': {'status': new_status_value}})
