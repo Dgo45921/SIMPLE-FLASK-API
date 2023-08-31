@@ -15,19 +15,33 @@ def add_reading():
     try:
         data = request.get_json()
 
-        temperature = data.get('temperature')
-        aqi = data.get('aqi')
-        co2 = data.get('co2')
-        light = data.get('light')
+        aqi = data.get('ppm')
+        lumen = data.get('lumen')
+        temp = data.get('temp')
+        humidity = data.get('humedad')
+        proximity = data.get('proximidad')
 
-        if temperature is None or aqi is None or co2 is None or light is None:
+        notificacion_luz_encendida = data.get('notificacion_luz_encendida')
+        notificacion_luz_apagada = data.get('notificacion_luz_apagada')
+        notificacion_aire_sucio = data.get('notificacion_aire_sucio')
+        notificacion_aire_limpio = data.get('notificacion_aire_limpio')
+
+        if temp is None or aqi is None or lumen is None or humidity is None or proximity is None\
+                or notificacion_luz_encendida is None or notificacion_luz_apagada is None \
+                or notificacion_aire_sucio is None or notificacion_aire_limpio is None:
             return jsonify({'error': 'Missing data'}), 400
 
         new_reading = {
-            'temperature': temperature,
-            'aqi': aqi,
-            'co2': co2,
-            'light': light
+            'ppm': aqi,
+            'lumen': lumen,
+            'temp': temp,
+            'humedad': humidity,
+            'proximidad': proximity,
+            'notificacion_luz_encendida': notificacion_luz_encendida,
+            'notificacion_luz_apagada': notificacion_luz_apagada,
+            'notificacion_aire_sucio': notificacion_aire_sucio,
+            'notificacion_aire_limpio': notificacion_aire_limpio
+
         }
 
         result = collection.insert_one(new_reading)
