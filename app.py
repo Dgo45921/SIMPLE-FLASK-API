@@ -104,7 +104,7 @@ def get_last_reading():
 def get_readings():
     try:
         readings = list(collection.find({}, {'_id': 0}))
-        return jsonify({'last_reading': readings[len(readings) - 1]})
+        return jsonify( readings[len(readings) - 1])
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
