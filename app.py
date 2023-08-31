@@ -29,9 +29,9 @@ def update_status():
         new_status = data['status']
 
         # Remove any existing status documents
-        collection.delete_many({})
+        bulbcollection.delete_many({})
 
-        result = collection.insert_one({'status': new_status})
+        result = bulbcollection.insert_one({'status': new_status})
 
         return jsonify({'message': 'Status updated successfully', 'inserted_id': str(result.inserted_id)})
     except Exception as e:
