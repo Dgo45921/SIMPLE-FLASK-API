@@ -9,6 +9,47 @@ client = MongoClient(uri)
 db = client['sensor_data']
 collection = db['readings']
 
+bulbcollection = db['status']  # Use 'status' bulbcollection to store light bulb status
+
+
+# Error response
+def error_response(message, status_code):
+    return jsonify({'error': message}), status_code
+
+
+# Update light bulb status (replace existing status)
+@app.route('/update_status', methods=['POST'])
+def update_status():
+    try:
+        data = request.get_json()
+
+        if 'status' not in data:
+            return error_response('Missing status data', 400)
+
+        new_status = data['status']
+
+        # Remove any existing status documents
+        collection.delete_many({})
+
+        result = collection.insert_one({'status': new_status})
+
+        return jsonify({'message': 'Status updated successfully', 'inserted_id': str(result.inserted_id)})
+    except Exception as e:
+        return error_response(str(e), 500)
+
+
+@app.route('/get_status', methods=['GET'])
+def get_status():
+    try:
+        latest_status = bulbcollection.find_one({}, {'_id': 0, 'status': 1})
+        if latest_status:
+            bulbcollection.delete_many({})
+            return jsonify({'status': latest_status['status']})
+        else:
+            return jsonify({'message': 'No status available'}), 404
+    except Exception as e:
+        return error_response(str(e), 500)
+
 
 @app.route('/add_reading', methods=['POST'])
 def add_reading():
@@ -25,7 +66,7 @@ def add_reading():
         notificacion_aire_sucio = data.get('notificacion_aire_sucio')
         notificacion_aire_limpio = data.get('notificacion_aire_limpio')
 
-        if temp is None or aqi is None or lumen is None or humidity is None or proximity is None\
+        if temp is None or aqi is None or lumen is None or humidity is None or proximity is None \
                 or notificacion_luz_encendida is None or notificacion_luz_apagada is None \
                 or notificacion_aire_sucio is None or notificacion_aire_limpio is None:
             return jsonify({'error': 'Missing data'}), 400
@@ -63,10 +104,9 @@ def get_last_reading():
 def get_readings():
     try:
         readings = list(collection.find({}, {'_id': 0}))
-        return jsonify({'last_reading': readings[len(readings)-1]})
+        return jsonify({'last_reading': readings[len(readings) - 1]})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 
 if __name__ == '__main__':
