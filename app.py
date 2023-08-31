@@ -17,23 +17,29 @@ def error_response(message, status_code):
     return jsonify({'error': message}), status_code
 
 
-# Update light bulb status (replace existing status)
+# Update light bulb status (toggle from false to true)
 @app.route('/update_status', methods=['POST'])
 def update_status():
     try:
-        data = request.get_json()
+        # Fetch the current status document
+        current_status = collection.find_one({}, {'_id': 0, 'status': 1})
 
-        if 'status' not in data:
-            return error_response('Missing status data', 400)
+        if current_status:
+            # Get the current status value
+            current_status_value = current_status['status']
 
-        new_status = data['status']
+            # If the current status is False, change it to True
+            if current_status_value is False:
+                new_status_value = True
+            else:
+                new_status_value = current_status_value
 
-        # Remove any existing status documents
-        bulbcollection.delete_many({})
+            # Update the existing status document with the new status value
+            collection.update_one({}, {'$set': {'status': new_status_value}})
 
-        result = bulbcollection.insert_one({'status': new_status})
-
-        return jsonify({'message': 'Status updated successfully', 'inserted_id': str(result.inserted_id)})
+            return jsonify({'message': 'Status updated successfully'})
+        else:
+            return jsonify({'message': 'No status available'}), 404
     except Exception as e:
         return error_response(str(e), 500)
 
@@ -43,7 +49,6 @@ def get_status():
     try:
         latest_status = bulbcollection.find_one({}, {'_id': 0, 'status': 1})
         if latest_status:
-            bulbcollection.delete_many({})
             return jsonify({'status': latest_status['status']})
         else:
             return jsonify({'message': 'No status available'}), 404
