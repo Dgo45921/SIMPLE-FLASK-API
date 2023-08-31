@@ -20,7 +20,6 @@ def add_reading():
         temp = data.get('temp')
         humidity = data.get('humedad')
         proximity = data.get('proximidad')
-
         notificacion_luz_encendida = data.get('notificacion_luz_encendida')
         notificacion_luz_apagada = data.get('notificacion_luz_apagada')
         notificacion_aire_sucio = data.get('notificacion_aire_sucio')
@@ -52,12 +51,22 @@ def add_reading():
 
 
 @app.route('/get_readings', methods=['GET'])
-def get_readings():
+def get_last_reading():
     try:
-        readings = list(collection.find({}, {'_id': 0}))  # Exclude '_id' field from results
+        readings = list(collection.find({}, {'_id': 0}))
         return jsonify({'readings': readings})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/get_last_reading', methods=['GET'])
+def get_readings():
+    try:
+        readings = list(collection.find({}, {'_id': 0}))
+        return jsonify({'last_reading': readings[len(readings)-1]})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 
 if __name__ == '__main__':
