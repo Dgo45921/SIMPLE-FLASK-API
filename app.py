@@ -22,7 +22,7 @@ def error_response(message, status_code):
 def update_status():
     try:
         # Fetch the current status document
-        current_status = collection.find_one({}, {'_id': 0, 'status': 1})
+        current_status = bulbcollection.find_one({}, {'_id': 0, 'status': 1})
 
         if current_status:
             # Get the current status value
@@ -35,7 +35,7 @@ def update_status():
                 new_status_value = current_status_value
 
             # Update the existing status document with the new status value
-            collection.update_one({}, {'$set': {'status': new_status_value}})
+            bulbcollection.update_one({}, {'$set': {'status': new_status_value}})
 
             return jsonify({'message': 'Status updated successfully'})
         else:
