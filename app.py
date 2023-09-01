@@ -11,6 +11,7 @@ collection = db['readings']
 
 bulbcollection = db['bulb_status']  # Use 'status' bulbcollection to store light bulb status
 aircollection = db['air_status']  # Use 'status' bulbcollection to store light bulb status
+notificationcollection = db['notifications']
 
 
 # Error response
@@ -121,11 +122,49 @@ def add_reading():
 
         print(new_reading)
 
+        if notificacion_luz_encendida:
+            newnoti = {
+                'message': 'La luz fue encendida'
+            }
+
+            notificationcollection.insert_one(newnoti)
+
+        if notificacion_luz_apagada:
+            newnoti = {
+                'message': 'La luz fue apagada'
+            }
+
+            notificationcollection.insert_one(newnoti)
+
+        if notificacion_aire_sucio:
+            newnoti = {
+                'message': 'La calidad del aire es mala!'
+            }
+
+            notificationcollection.insert_one(newnoti)
+
+        if notificacion_aire_limpio:
+            newnoti = {
+                'message': 'El aire esta limpio'
+            }
+
+            notificationcollection.insert_one(newnoti)
+
         result = collection.insert_one(new_reading)
 
         return jsonify({'message': 'Reading added successfully', 'inserted_id': str(result.inserted_id)})
     except Exception as e:
         print(e)
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/get_last_notifications', methods=['GET'])
+def get_last_notifications():
+    try:
+        readings = list(notificationcollection.find({}, {'_id': 0}))
+        last_4_readings = readings[-4:]  # Using slicing to get the last 4 elements
+        return jsonify(last_4_readings)
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 
