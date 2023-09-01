@@ -20,7 +20,7 @@ def error_response(message, status_code):
 
 # Update light air status (toggle from false to true)
 @app.route('/update_air_status', methods=['POST'])
-def update_status():
+def update_air_status():
     try:
         # Fetch the current status document
         current_status = aircollection.find_one({}, {'_id': 0, 'status': 1})
@@ -42,7 +42,7 @@ def update_status():
 
 
 @app.route('/get_air_status', methods=['GET'])
-def get_status():
+def get_air_status():
     try:
         latest_status = aircollection.find_one({}, {'_id': 0, 'status': 1})
         if latest_status:
@@ -55,7 +55,7 @@ def get_status():
 
 # Update light bulb status (toggle from false to true)
 @app.route('/update_bulb_status', methods=['POST'])
-def update_status():
+def update_bulb_status():
     try:
         # Fetch the current status document
         current_status = bulbcollection.find_one({}, {'_id': 0, 'status': 1})
@@ -77,7 +77,7 @@ def update_status():
 
 
 @app.route('/get_bulb_status', methods=['GET'])
-def get_status():
+def get_bulb_status():
     try:
         latest_status = bulbcollection.find_one({}, {'_id': 0, 'status': 1})
         if latest_status:
