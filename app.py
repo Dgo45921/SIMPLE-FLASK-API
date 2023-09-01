@@ -9,7 +9,8 @@ client = MongoClient(uri)
 db = client['sensor_data']
 collection = db['readings']
 
-bulbcollection = db['status']  # Use 'status' bulbcollection to store light bulb status
+bulbcollection = db['bulb_status']  # Use 'status' bulbcollection to store light bulb status
+aircollection = db['air_status']  # Use 'status' bulbcollection to store light bulb status
 
 
 # Error response
@@ -17,8 +18,43 @@ def error_response(message, status_code):
     return jsonify({'error': message}), status_code
 
 
+# Update light air status (toggle from false to true)
+@app.route('/update_air_status', methods=['POST'])
+def update_status():
+    try:
+        # Fetch the current status document
+        current_status = aircollection.find_one({}, {'_id': 0, 'status': 1})
+
+        if current_status:
+            # Get the current status value
+            current_status_value = current_status['status']
+
+            new_status_value = not current_status_value
+
+            # Update the existing status document with the new status value
+            aircollection.update_one({}, {'$set': {'status': new_status_value}})
+
+            return jsonify({'status': new_status_value})
+        else:
+            return jsonify({'message': 'No status available'}), 404
+    except Exception as e:
+        return error_response(str(e), 500)
+
+
+@app.route('/get_air_status', methods=['GET'])
+def get_status():
+    try:
+        latest_status = aircollection.find_one({}, {'_id': 0, 'status': 1})
+        if latest_status:
+            return jsonify({'status': latest_status['status']})
+        else:
+            return jsonify({'message': 'No status available'}), 404
+    except Exception as e:
+        return error_response(str(e), 500)
+
+
 # Update light bulb status (toggle from false to true)
-@app.route('/update_status', methods=['POST'])
+@app.route('/update_bulb_status', methods=['POST'])
 def update_status():
     try:
         # Fetch the current status document
@@ -33,14 +69,14 @@ def update_status():
             # Update the existing status document with the new status value
             bulbcollection.update_one({}, {'$set': {'status': new_status_value}})
 
-            return jsonify({'message': 'Status updated successfully'})
+            return jsonify({'status': new_status_value} )
         else:
             return jsonify({'message': 'No status available'}), 404
     except Exception as e:
         return error_response(str(e), 500)
 
 
-@app.route('/get_status', methods=['GET'])
+@app.route('/get_bulb_status', methods=['GET'])
 def get_status():
     try:
         latest_status = bulbcollection.find_one({}, {'_id': 0, 'status': 1})
@@ -105,7 +141,7 @@ def get_last_reading():
 def get_readings():
     try:
         readings = list(collection.find({}, {'_id': 0}))
-        return jsonify( readings[len(readings) - 1])
+        return jsonify(readings[len(readings) - 1])
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
