@@ -69,7 +69,7 @@ def update_bulb_status():
             # Update the existing status document with the new status value
             bulbcollection.update_one({}, {'$set': {'status': new_status_value}})
 
-            return jsonify({'status': new_status_value} )
+            return jsonify({'status': new_status_value})
         else:
             return jsonify({'message': 'No status available'}), 404
     except Exception as e:
@@ -103,11 +103,6 @@ def add_reading():
         notificacion_aire_sucio = data.get('notificacion_aire_sucio')
         notificacion_aire_limpio = data.get('notificacion_aire_limpio')
 
-        if temp is None or aqi is None or lumen is None or humidity is None or proximity is None \
-                or notificacion_luz_encendida is None or notificacion_luz_apagada is None \
-                or notificacion_aire_sucio is None or notificacion_aire_limpio is None:
-            return jsonify({'error': 'Missing data'}), 400
-
         new_reading = {
             'ppm': aqi,
             'lumen': lumen,
@@ -121,10 +116,13 @@ def add_reading():
 
         }
 
+        print(new_reading)
+
         result = collection.insert_one(new_reading)
 
         return jsonify({'message': 'Reading added successfully', 'inserted_id': str(result.inserted_id)})
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
 
 
