@@ -19,7 +19,7 @@ def error_response(message, status_code):
 
 
 # Update light air status (toggle from false to true)
-@app.route('/update_air_status', methods=['POST'])
+@app.route('/update_air_status', methods=['GET'])
 def update_air_status():
     try:
         # Fetch the current status document
@@ -54,7 +54,7 @@ def get_air_status():
 
 
 # Update light bulb status (toggle from false to true)
-@app.route('/update_bulb_status', methods=['POST'])
+@app.route('/update_bulb_status', methods=['GET'])
 def update_bulb_status():
     try:
         # Fetch the current status document
