@@ -91,7 +91,10 @@ def get_bulb_status():
 @app.route('/add_reading', methods=['POST'])
 def add_reading():
     try:
+
+        print(request)
         data = request.get_json()
+        print(data)
 
         aqi = data.get('ppm')
         lumen = data.get('lumen')
